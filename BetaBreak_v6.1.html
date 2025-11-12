@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beta Break Digital</title>
+    <style>
+        /* Base Reset and Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7; /* Restored original background */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            color: #1f2937;
+        }
+
+        /* --- Components --- */
+        .app-container {
+            width: 100%;
+            max-width: 896px; /* max-w-4xl */
+            padding: 1rem;
+        }
+
+        .section-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .card-modal-container {
+            width: 100%;
+            max-width: 400px;
+            height: 550px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease-in-out;
+            background-color: white;
+        }
+
+        .card-image-bg {
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .card-content {
+            flex-grow: 1;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .eliminate-tag {
+            background-color: #fca5a5; /* Red-300 */
+            color: #7f1d1d; /* Red-900 */
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 0.875rem;
+        }
+
+        .active-card-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 2px solid;
+            font-size: 0.875rem;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            text-align: center;
+            border: none;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .btn-green { background-color: #16a34a; color: white; } /* Green-600 */
+        .btn-green:hover { background-color: #15803d; } /* Green-700 */
+        
+        .btn-blue { background-color: #2563eb; color: white; } /* Blue-600 */
+        .btn-blue:hover { background-color: #1d4ed8; } /* Blue-700 */
+        
+        .btn-red { background-color: #ef4444; color: white; } /* Red-500 */
+        .btn-red:hover { background-color: #dc2626; } /* Red-600 */
+
+        .btn-outline {
+            border: 1px solid #d1d5db;
+            background-color: white;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .btn-outline:hover { background-color: #f9fafb; }
+
+        /* Inputs */
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            outline: none;
+        }
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Typography & Utility (Only necessary ones maintained) */
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .font-extrabold { font-weight: 800; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .grid { display: grid; }
+        .w-full { width: 100%; }
+        .border-b { border-bottom: 1px solid #e5e7eb; }
+        .pb-2 { padding-bottom: 0.5rem; }
+        
+        .bg-blue-50 { background-color: #eff6ff; }
+        .bg-yellow-50 { background-color: #fefce8; }
+        .bg-indigo-50 { background-color: #eef2ff; }
+        .bg-orange-50 { background-color: #fff7ed; }
+        
+        .rounded-lg { border-radius: 0.5rem; }
+        .p-4 { padding: 1rem; }
+        
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        /* Specific Borders */
+        .border-l-4 { border-left-width: 4px; }
+        .border-blue-500 { border-color: #3b82f6; }
+        .border-indigo-400 { border-color: #818cf8; }
+        .border-orange-400 { border-color: #fb923c; }
+        .border-indigo-700 { color: #4338ca; border-color: #4338ca; }
+        .border-orange-700 { color: #c2410c; border-color: #c2410c; }
+        .border-red-700 { color: #b91c1c; border-color: #b91c1c; }
+
+        /* Status Badges */
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+        }
+        .badge-climber { background-color: #bfdbfe; color: #1e40af; } /* blue-200, blue-800 */
+        .badge-ghost { background-color: #e5e7eb; color: #374151; } /* gray-200, gray-800 */
+        .badge-active { background-color: #bbf7d0; color: #166534; } /* green-200, green-800 */
+        
+        .player-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .player-active { background-color: #dbeafe; border: 2px solid #60a5fa; } /* blue-100, blue-400 */
+        .player-inactive { background-color: #f9fafb; } /* gray-50 */
+
+        .overflow-y-auto { overflow-y: auto; }
+        .max-h-56 { max-height: 14rem; }
+        
+        /* List Styles for Rules */
+        .rules-modal-content {
+            width: 95%;
+            max-width: 600px;
+            max-height: 80vh;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div id="app" class="app-container">
+        <h1 class="text-3xl font-extrabold text-center mb-6 text-gray-800">
+            🧗 Beta Break Digital
+        </h1>
+
+        <!-- START SCREEN -->
+        <div id="setup-screen" class="section-card">
+            <h2 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2">1. Game Setup</h2>
+            
+            <div class="mb-4">
+                <label for="routeLength" class="text-sm font-bold text-gray-700" style="display:block; margin-bottom:0.25rem;">Route Handhold Count (Must be 5+)</label>
+                <input type="number" id="routeLength" value="10" min="5" class="input-field" onchange="updateDeckEstimate()">
+                <p id="deck-estimate" class="text-xs text-gray-500 mt-1">Recommended Eliminate Cards: 6</p>
+            </div>
+
+            <h2 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2">2. Add Climbers</h2>
+            <div id="player-inputs" style="margin-bottom: 1.5rem;">
+                <!-- Initial two player inputs -->
+                <div class="flex gap-2" style="margin-bottom: 0.75rem;">
+                    <input type="text" placeholder="Climber 1 Name" class="input-field" value="Climber A">
+                </div>
+                <div class="flex gap-2" style="margin-bottom: 0.75rem;">
+                    <input type="text" placeholder="Climber 2 Name" class="input-field" value="Climber B">
+                </div>
+            </div>
+            
+            <button onclick="addClimberInput()" class="btn btn-outline mb-6">
+                + Add Another Climber
+            </button>
+
+            <!-- 3. GAME CREDIT -->
+            <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem;">
+                <p class="text-xs text-gray-500 text-center font-medium">
+                    Beta Break Digital based on the original **Beta Break™** game.
+                    Game design by **Caleb J. Ross**. Card design/art by **Madison Turner**.
+                    Copyright &copy; 2025 Ross Publishing, LLC.
+                </p>
+            </div>
+            
+            <button id="start-game-btn" onclick="startGame()" class="btn btn-green text-xl mt-4">
+                Start Game
+            </button>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="game-screen" class="hidden w-full">
+            
+            <!-- CURRENT STATUS -->
+            <div class="section-card" style="border-top: 4px solid #3b82f6;">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 flex justify-between items-center">
+                    Current Game Status
+                    <span id="problem-holds" class="text-sm font-normal bg-gray-100 px-3 py-1 rounded-lg text-gray-700 border border-gray-200">Holds: N/A</span>
+                </h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                        <p class="text-sm font-medium text-blue-700">Current Climber</p>
+                        <p id="current-climber-name" class="text-xl font-extrabold text-blue-900 truncate">Waiting...</p>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+                        <p class="text-sm font-medium text-yellow-700">Cards Remaining</p>
+                        <p id="cards-remaining-count" class="text-xl font-extrabold text-yellow-900">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTIVE EFFECTS -->
+            <div class="section-card">
+                <h2 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2">Active Problem Effects</h2>
+                
+                <!-- Active Beta -->
+                <div id="active-beta-display" class="mb-4 p-4 rounded-lg bg-indigo-50 border-l-4 border-indigo-400">
+                    <p class="active-card-title text-indigo-700 border-indigo-700">Active Beta</p>
+                    <div id="active-beta-content" class="text-gray-900 text-sm">Waiting for game start...</div>
+                </div>
+                
+                <!-- Active Break -->
+                <div id="active-break-display" class="mb-4 p-4 rounded-lg bg-orange-50 border-l-4 border-orange-400">
+                    <p class="active-card-title text-orange-700 border-orange-700">Active Break</p>
+                    <div id="active-break-content" class="text-gray-900 text-sm">Waiting for game start...</div>
+                </div>
+                
+                <!-- Eliminated Holds -->
+                <div id="eliminated-holds-display" class="mt-4">
+                    <p class="text-md font-bold mb-2 text-red-700">Eliminated Holds:</p>
+                    <div id="eliminated-holds-list" class="flex flex-wrap gap-2">
+                        <p class="text-sm text-gray-500 italic">None so far.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PLAYER LIST & CONTROLS -->
+            <div class="section-card">
+                <h2 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2">Player Status</h2>
+                <div id="player-list" style="margin-bottom: 1.5rem;">
+                    <!-- Player list will be inserted here -->
+                </div>
+                
+                <!-- CLIMBER ACTIONS -->
+                <div id="climber-actions" style="border-top: 1px solid #e5e7eb; padding-top: 1rem;">
+                    <button id="draw-card-btn" onclick="drawCard()" class="btn btn-blue text-lg shadow-md">
+                        Draw Card & Start Turn
+                    </button>
+                    
+                    <div id="send-outcome-buttons" class="hidden grid grid-cols-2 gap-4 mt-4">
+                        <button onclick="recordSendOutcome(true)" class="btn btn-green shadow-md">
+                            Succeeded Send
+                        </button>
+                        <button onclick="recordSendOutcome(false)" class="btn btn-red shadow-md">
+                            Failed Send
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 mt-4">
+                    <button onclick="showRules()" class="btn btn-outline" style="width: 50%;">View Rules</button>
+                    <button onclick="showSetup()" class="btn btn-outline" style="width: 50%;">New Game</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRAWN CARD OVERLAY -->
+        <div id="drawn-card-overlay" class="overlay hidden">
+            <div class="card-modal-container" id="drawn-card-modal">
+                <div class="card-image-bg" id="drawn-card-image" style="background-image: url('https://placehold.co/400x600/3b82f6/ffffff?text=CARD');"></div>
+                <div class="card-content">
+                    <div>
+                        <p id="drawn-card-type" class="text-sm font-bold mb-1 text-gray-500 uppercase"></p>
+                        <h3 id="drawn-card-name" class="text-2xl font-extrabold mb-4 text-gray-800">Card Name</h3>
+                        <div id="drawn-card-description" class="text-gray-700 text-base leading-relaxed overflow-y-auto max-h-56">Card Description</div>
+                    </div>
+                    <button onclick="acknowledgeCard()" class="btn btn-green mt-4 shadow-md">
+                        Acknowledge Card & Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ELIMINATE HOLD MODAL -->
+        <div id="eliminate-modal" class="overlay hidden">
+            <div class="section-card" style="width: 100%; max-width: 24rem; border-top: 4px solid #ef4444;">
+                <h3 class="text-xl font-bold mb-4 text-red-700">Eliminate a Hold!</h3>
+                <p class="mb-4 text-gray-700 text-sm">The current Climber must name the hold they are eliminating.</p>
+                <input type="text" id="eliminated-hold-name" placeholder="E.g., Blue crimp on left" class="input-field mb-4">
+                <button onclick="confirmEliminateHold()" class="btn btn-red shadow-md">
+                    Confirm Elimination
+                </button>
+            </div>
+        </div>
+        
+        <!-- WINNER MODAL -->
+        <div id="winner-modal" class="overlay hidden">
+            <div class="section-card text-center" style="width: 100%; max-width: 28rem; border-top: 4px solid #16a34a;">
+                <p class="text-3xl mb-4">🏆</p>
+                <h3 class="text-3xl font-extrabold text-blue-700 mb-2">Game Over!</h3>
+                <p id="winner-name" class="text-2xl font-bold text-gray-800 mb-6">The Winner is:</p>
+                <button onclick="resetGame()" class="btn btn-blue shadow-md">
+                    Play Again
+                </button>
+            </div>
+        </div>
+
+        <!-- RULES MODAL -->
+        <div id="rules-modal" class="overlay hidden">
+            <div class="rules-modal-content">
+                <div class="flex justify-between items-center border-b pb-2 mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Rules & Glossary</h2>
+                    <button onclick="hideRules()" class="text-gray-500 hover:text-gray-700 font-bold text-xl" style="padding: 0 0.5rem;">&times;</button>
+                </div>
+                
+                <h3 class="text-lg font-bold text-blue-700 mb-2">How It Works</h3>
+                <p class="text-sm text-gray-700 mb-4">Climbers compete to be the last player standing by sending an indoor boulder problem. Cards introduce unique challenges.</p>
+                
+                <h3 class="text-lg font-bold text-blue-700 mb-2">Turn Structure (The Climber's Turn)</h3>
+                <ol style="list-style-type: decimal; padding-left: 1.5rem;" class="text-sm text-gray-700 mb-4">
+                    <li>The Climber **Draws a Card**.</li>
+                    <li>The card's effect is applied:
+                        <ul style="list-style-type: disc; padding-left: 1.5rem; margin-top: 0.25rem;">
+                            <li>**Beta or Break:** Replaces the active card of its type.</li>
+                            <li>**Eliminate:** The Climber names one hold on the problem to be **eliminated** (removed from use).</li>
+                        </ul>
+                    </li>
+                    <li>The Climber attempts to **Send** the problem, adhering to the combined active **Beta**, active **Break**, and all **Eliminated Holds**.</li>
+                    <li>The Climber records the send outcome (**Succeeded/Failed**).</li>
+                    <li>The turn ends, and the next player begins.</li>
+                </ol>
+
+                <h3 class="text-lg font-bold text-blue-700 mb-2">Ghost Players & Winning</h3>
+                <ul style="list-style-type: disc; padding-left: 1.5rem;" class="text-sm text-gray-700 mb-4">
+                    <li>If a player **fails** their send, they become a **Ghost Player**.</li>
+                    <li>**Ghost Bonus:** If a Ghost Player **succeeds** a send, they may **ADD** one previously eliminated hold back to the problem.</li>
+                    <li>The game ends when all but one Climber is an active Player.</li>
+                </ul>
+
+                <h3 class="text-lg font-bold text-red-700 mb-2">Safety Rule</h3>
+                <p class="text-sm text-red-700 font-bold mb-4">
+                    Always prioritize safety. If the Climber feels unsafe, they can attempt the send without adhering to the active Beta or Break cards.
+                </p>
+                
+                <button onclick="hideRules()" class="btn btn-blue mt-4">Close</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- GLOBAL GAME STATE ---
+        let gameState = {
+            players: [],
+            deck: [],
+            discard: [],
+            eliminatedHolds: [],
+            activeBeta: null,
+            activeBreak: null,
+            currentClimberIndex: 0,
+            routeLength: 10,
+            pendingDrawnCard: null, 
+            isAcknowledged: false, 
+            hasGhostSucceeded: false, 
+        };
+
+        // --- CARD DEFINITIONS (Consolidated from PDF) ---
+        const BASE_CARDS = [
+            // BETA CARDS (15 unique rules)
+            { id: 1, name: "Hands Only", type: "Beta", description_html: "Climb using only designated handholds. Use of any intermediate or texture on the wall is prohibited.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Hands+Only" },
+            { id: 2, name: "Feet First", type: "Beta", description_html: "Must establish feet on the first foothold before touching any handholds.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Feet+First" },
+            { id: 3, name: "Silent Feet", type: "Beta", description_html: "All foot placements must be silent. Any audible scraping or tapping results in a failed send.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Silent+Feet" },
+            { id: 4, name: "No Back-tracking", type: "Beta", description_html: "Once a hand or foot leaves a hold, it cannot return to that hold on the same attempt.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=No+Back-tracking" },
+            { id: 5, name: "Static Only", type: "Beta", description_html: "All movements must be static. Any sustained dynamic movement (dyno, lunge) results in a failed send.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Static+Only" },
+            { id: 6, name: "Hand Besties", type: "Beta", description_html: "Every use of a hand on a hold must be matched by the other hand before moving on.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Hand+Besties" },
+            { id: 7, name: "T-Rex", type: "Beta", description_html: "No straight elbows during the climb.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=T-Rex" },
+            { id: 8, name: "Toes Only", type: "Beta", description_html: "Only use your toes when using your feet (no heels, no arches).", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Toes+Only" },
+            { id: 9, name: "No Adjusting", type: "Beta", description_html: "Once you grab a hold or place a foot, you cannot adjust or reposition your hand or foot.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=No+Adjusting" },
+            { id: 10, name: "Tripod", type: "Beta", description_html: "Max 3 points of contact at any time.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Tripod" },
+            { id: 11, name: "Invisible Chair", type: "Beta", description_html: "No straight legs during the climb.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Invisible+Chair" },
+            { id: 12, name: "No Edges", type: "Beta", description_html: "No using any outside edge/rand of your shoes (including the toe edge and heel edge) against the wall for balance.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=No+Edges" },
+            { id: 13, name: "Peace!", type: "Beta", description_html: "Only 2 fingers on each hand can be in contact with any hold at a given time.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Peace!" },
+            { id: 14, name: "Hand-emies", type: "Beta", description_html: "No hand-matching any holds.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Hand-emies" },
+            { id: 15, name: "Foot-emies", type: "Beta", description_html: "No foot-matching any holds.", image_url: "https://placehold.co/400x600/3b82f6/ffffff?text=Foot-emies" },
+            
+            // BREAK CARDS (12 unique rules)
+            { id: 101, name: "Mandatory Dyno", type: "Break", description_html: "At some point during the problem, the Climber must use a dynamic movement (no feet or hands momentarily contacting holds).", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Dyno+Break" },
+            { id: 102, name: "Heel Hook Required", type: "Break", description_html: "Use a heel hook to complete at least 1 move.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Heel+Hook" },
+            { id: 103, name: "No Smearing", type: "Break", description_html: "All footholds must be used as intended; no smearing on the wall is allowed.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=No+Smearing" },
+            { id: 104, name: "Flagging Required", type: "Break", description_html: "The climber must use a non-weight-bearing flag (back flag or side flag) for at least one move during the send.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Flagging+Required" },
+            { id: 105, name: "High Step", type: "Break", description_html: "Complete at least 1 move by placing a foot above waist height.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=High+Step" },
+            { id: 106, name: "Gaston Required", type: "Break", description_html: "Use a gaston (grab a hold with your thumb toward the ground, pulling outward) to complete at least 1 move.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Gaston+Required" },
+            { id: 107, name: "Legs Crossed", type: "Break", description_html: "Complete at least 1 move by crossing a leg over the other leg.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Legs+Crossed" },
+            { id: 108, name: "Toe Hook", type: "Break", description_html: "Use a toe hook to complete at least 1 move.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Toe+Hook" },
+            { id: 109, name: "Drop Knee", type: "Break", description_html: "Use a Drop Knee to complete at least 1 move.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Drop+Knee" },
+            { id: 110, name: "Palm Press", type: "Break", description_html: "Use a palm press (use the palm of your hand to press against a hold or surface for stability) to complete at least 1 move.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Palm+Press" },
+            { id: 111, name: "Deadpoint", type: "Break", description_html: "Complete at least 1 move with a quick, dynamic reach to the next hold, without pausing, while keeping one foot planted.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Deadpoint" },
+            { id: 112, name: "Footswap", type: "Break", description_html: "Swap a foot with the other foot on the same hold without removing both feet from the wall.", image_url: "https://placehold.co/400x600/f97316/ffffff?text=Footswap" },
+            
+            // ELIMINATE CARD (Rule is handled by logic)
+            { id: 201, name: "Eliminate Hold", type: "Eliminate", description_html: "The Climber names and eliminates one handhold for all subsequent attempts.", image_url: "https://placehold.co/400x600/dc2626/ffffff?text=ELIMINATE+CARD" },
+        ];
+        
+        // --- UTILITY FUNCTIONS ---
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function updateDeckEstimate() {
+            const routeLength = parseInt(document.getElementById('routeLength').value) || 0;
+            const eliminateCount = Math.max(0, routeLength - 4); 
+            document.getElementById('deck-estimate').textContent = `Recommended Eliminate Cards: ${eliminateCount}`;
+        }
+
+        // --- VIEW MANAGEMENT ---
+
+        function showSetup() {
+            document.getElementById('setup-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('winner-modal').classList.add('hidden');
+        }
+
+        function showGame() {
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+        }
+
+        function showRules() { document.getElementById('rules-modal').classList.remove('hidden'); }
+        function hideRules() { document.getElementById('rules-modal').classList.add('hidden'); }
+
+        function addClimberInput() {
+            const container = document.getElementById('player-inputs');
+            const count = container.children.length + 1;
+            const div = document.createElement('div');
+            div.className = 'flex gap-2';
+            div.style.marginBottom = '0.75rem';
+            div.innerHTML = `
+                <input type="text" placeholder="Climber ${count} Name" class="input-field" value="Climber ${String.fromCharCode(65 + count - 1)}">
+                <button onclick="this.parentNode.remove()" class="btn btn-red" style="width: 3rem; padding: 0;">X</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // --- GAME LOGIC ---
+
+        function initializeDeck(routeLength) {
+            const deck = [];
+            
+            const eliminateCount = Math.max(0, routeLength - 4);
+            const eliminateCard = BASE_CARDS.find(c => c.type === 'Eliminate');
+            for (let i = 0; i < eliminateCount; i++) deck.push({...eliminateCard, id: `Elim-${i}`});
+
+            const numPlayers = gameState.players.length;
+            const betaCards = BASE_CARDS.filter(c => c.type === 'Beta');
+            const breakCards = BASE_CARDS.filter(c => c.type === 'Break');
+            
+            for (let i = 0; i < numPlayers * 3; i++) {
+                deck.push({...betaCards[i % betaCards.length], id: `Beta-${i}`});
+                deck.push({...breakCards[i % breakCards.length], id: `Break-${i}`});
+            }
+            return shuffle(deck);
+        }
+
+        function startGame() {
+            const playerInputs = Array.from(document.querySelectorAll('#player-inputs input[type="text"]'));
+            const climbers = playerInputs.map(i => i.value.trim()).filter(n => n.length > 0)
+                .map(name => ({ name, isGhost: false, id: crypto.randomUUID() }));
+
+            if (climbers.length < 2) { console.error("You need at least two climbers to start the game."); return; }
+            const routeLength = parseInt(document.getElementById('routeLength').value);
+            if (routeLength < 5) { console.error("Please enter a route length of 5 or more handholds."); return; }
+
+            // Reset Game State
+            gameState.players = climbers;
+            gameState.currentClimberIndex = 0;
+            gameState.eliminatedHolds = [];
+            gameState.routeLength = routeLength;
+            gameState.activeBeta = null;
+            gameState.activeBreak = null;
+            gameState.pendingDrawnCard = null;
+            gameState.isAcknowledged = false;
+            gameState.hasGhostSucceeded = false;
+
+            gameState.deck = initializeDeck(routeLength);
+            gameState.discard = [];
+
+            // Initial Active Cards
+            const initBeta = gameState.deck.findIndex(c => c.type === 'Beta');
+            if (initBeta !== -1) gameState.activeBeta = gameState.deck.splice(initBeta, 1)[0];
+            
+            const initBreak = gameState.deck.findIndex(c => c.type === 'Break');
+            if (initBreak !== -1) gameState.activeBreak = gameState.deck.splice(initBreak, 1)[0];
+            
+            gameState.deck = shuffle(gameState.deck);
+            gameState.isAcknowledged = true;
+
+            showGame();
+            renderGame();
+        }
+
+        function drawCard() {
+            if (gameState.deck.length === 0) {
+                if (gameState.discard.length === 0) return;
+                gameState.deck = shuffle(gameState.discard);
+                gameState.discard = [];
+            }
+
+            const drawnCard = gameState.deck[0]; 
+            if (!drawnCard) return;
+
+            gameState.pendingDrawnCard = drawnCard;
+
+            document.getElementById('drawn-card-type').textContent = `${drawnCard.type} Card`;
+            document.getElementById('drawn-card-name').textContent = drawnCard.name;
+            document.getElementById('drawn-card-description').innerHTML = drawnCard.description_html;
+            document.getElementById('drawn-card-image').style.backgroundImage = `url('${drawnCard.image_url}')`;
+
+            const cardModal = document.getElementById('drawn-card-modal');
+            let color = drawnCard.type === 'Beta' ? '#4338ca' : (drawnCard.type === 'Break' ? '#c2410c' : '#b91c1c');
+            cardModal.style.borderTop = `8px solid ${color}`;
+
+            document.getElementById('drawn-card-overlay').classList.remove('hidden');
+            document.getElementById('draw-card-btn').classList.add('hidden');
+            renderGame();
+        }
+
+        function acknowledgeCard() {
+            const drawnCard = gameState.pendingDrawnCard;
+            if (!drawnCard) return;
+
+            gameState.deck.shift();
+            gameState.discard.push(drawnCard);
+
+            const currentPlayer = gameState.players[gameState.currentClimberIndex];
+            
+            if (drawnCard.type === 'Beta') gameState.activeBeta = drawnCard;
+            else if (drawnCard.type === 'Break') gameState.activeBreak = drawnCard;
+            else if (drawnCard.type === 'Eliminate' && !currentPlayer.isGhost) {
+                document.getElementById('drawn-card-overlay').classList.add('hidden');
+                document.getElementById('eliminate-modal').classList.remove('hidden');
+                gameState.pendingDrawnCard = null;
+                renderGame();
+                return;
+            }
+            
+            gameState.isAcknowledged = true;
+            gameState.pendingDrawnCard = null;
+            document.getElementById('drawn-card-overlay').classList.add('hidden');
+            document.getElementById('send-outcome-buttons').classList.remove('hidden');
+            renderGame();
+        }
+
+        function confirmEliminateHold() {
+            const holdName = document.getElementById('eliminated-hold-name').value.trim();
+            if (holdName) {
+                gameState.eliminatedHolds.push({ name: holdName, id: crypto.randomUUID() });
+                document.getElementById('eliminated-hold-name').value = '';
+                document.getElementById('eliminate-modal').classList.add('hidden');
+                gameState.isAcknowledged = true;
+                document.getElementById('send-outcome-buttons').classList.remove('hidden');
+                renderGame();
+            } else {
+                console.error("Please enter a hold name.");
+            }
+        }
+
+        function recordSendOutcome(succeeded) {
+            const currentPlayer = gameState.players[gameState.currentClimberIndex];
+            let shouldMove = true; 
+            gameState.hasGhostSucceeded = false;
+
+            if (succeeded) {
+                if (currentPlayer.isGhost && gameState.eliminatedHolds.length > 0) {
+                    gameState.hasGhostSucceeded = true;
+                    shouldMove = false;
+                }
+            } else {
+                currentPlayer.isGhost = true;
+            }
+
+            const active = gameState.players.filter(p => !p.isGhost);
+            if (active.length <= 1) {
+                endGame(active.length === 1 ? active[0].name : "The Ghosts won!");
+                return;
+            }
+
+            if (shouldMove) moveToNextPlayer();
+            else renderGame();
+        }
+
+        function moveToNextPlayer() {
+            document.getElementById('send-outcome-buttons').classList.add('hidden');
+            document.getElementById('draw-card-btn').classList.remove('hidden');
+            gameState.isAcknowledged = false; 
+            gameState.hasGhostSucceeded = false; 
+            gameState.currentClimberIndex = (gameState.currentClimberIndex + 1) % gameState.players.length;
+            renderGame();
+        }
+        
+        function removeEliminatedHold(holdId) {
+            if (gameState.hasGhostSucceeded) {
+                gameState.eliminatedHolds = gameState.eliminatedHolds.filter(h => h.id !== holdId);
+                moveToNextPlayer(); 
+            }
+            renderGame(); 
+        }
+
+        function endGame(winner) {
+            document.getElementById('winner-name').textContent = winner === "The Ghosts won!"
+                ? winner
+                : `The Winner is: ${winner}!`;
+            document.getElementById('winner-modal').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            showSetup();
+            renderGame(); 
+        }
+
+        function renderGame() {
+            const currentPlayer = gameState.players[gameState.currentClimberIndex];
+            
+            document.getElementById('current-climber-name').textContent = currentPlayer ? currentPlayer.name : "N/A";
+            document.getElementById('cards-remaining-count').textContent = gameState.deck.length;
+            document.getElementById('problem-holds').textContent = `Holds: ${gameState.routeLength - gameState.eliminatedHolds.length}`;
+            
+            document.getElementById('active-beta-content').innerHTML = gameState.activeBeta ? gameState.activeBeta.description_html : 'No Active Beta.';
+            document.getElementById('active-break-content').innerHTML = gameState.activeBreak ? gameState.activeBreak.description_html : 'No Active Break.';
+            
+            const holdsList = document.getElementById('eliminated-holds-list');
+            holdsList.innerHTML = ''; 
+            
+            if (gameState.eliminatedHolds.length === 0) {
+                holdsList.innerHTML = '<p class="text-sm text-gray-500 italic">None so far.</p>';
+            } else {
+                const canRemove = gameState.hasGhostSucceeded && currentPlayer.isGhost;
+                gameState.eliminatedHolds.forEach(hold => {
+                    // Changed button text to ADD
+                    const addBtn = canRemove 
+                        ? `<button onclick="removeEliminatedHold('${hold.id}')" class="ml-2 text-xs bg-white text-green-700 px-2 rounded hover:bg-green-100 border border-green-200">ADD</button>`
+                        : '';
+                    const div = document.createElement('div');
+                    div.className = 'eliminate-tag';
+                    div.innerHTML = `<span>${hold.name}</span>${addBtn}`;
+                    holdsList.appendChild(div);
+                });
+                // Changed instruction text to ADD
+                if (canRemove) holdsList.innerHTML += `<p class="w-full text-sm text-red-700 mt-2 font-bold">Ghost Bonus: Click 'ADD' to return a hold to the problem and end turn!</p>`;
+            }
+
+            const playerList = document.getElementById('player-list');
+            playerList.innerHTML = '';
+            gameState.players.forEach((player, index) => {
+                const isCurrent = index === gameState.currentClimberIndex;
+                const div = document.createElement('div');
+                div.className = `player-row ${isCurrent ? 'player-active' : 'player-inactive'}`;
+                
+                let badgeClass = player.isGhost ? 'badge-ghost' : 'badge-active';
+                let badgeText = player.isGhost ? 'GHOST' : 'ACTIVE';
+                if (isCurrent) {
+                    badgeClass = 'badge-climber';
+                    badgeText = player.isGhost ? 'GHOST TURN' : 'CLIMBER';
+                }
+
+                div.innerHTML = `
+                    <p class="font-bold text-gray-800 truncate">${player.name}</p>
+                    <span class="status-badge ${badgeClass}">${badgeText}</span>
+                `;
+                playerList.appendChild(div);
+            });
+            
+            const drawBtn = document.getElementById('draw-card-btn');
+            const outcomeBtns = document.getElementById('send-outcome-buttons');
+            
+            if (gameState.isAcknowledged) {
+                drawBtn.classList.add('hidden');
+                if (gameState.hasGhostSucceeded && currentPlayer.isGhost) outcomeBtns.classList.add('hidden');
+                else outcomeBtns.classList.remove('hidden');
+            } else {
+                drawBtn.classList.remove('hidden');
+                outcomeBtns.classList.add('hidden');
+            }
+        }
+        
+        window.onload = function() { updateDeckEstimate(); renderGame(); };
+    </script>
+</body>
+</html>
+
+
