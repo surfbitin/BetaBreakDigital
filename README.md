@@ -1,6 +1,6 @@
 # BetaBreakDigital
 
-A personal progressive web app based on [Beta Berak](https://www.betabreakgame.com/) (not my creation).
+A personal progressive web app based on [Beta Break](https://www.betabreakgame.com/) (not my creation).
 
 ## Overview
 
