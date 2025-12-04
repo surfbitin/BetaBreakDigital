@@ -4,7 +4,7 @@ A personal progressive web app based on [Beta Break](https://www.betabreakgame.c
 
 ## Overview
 
-**BetaBreakDigital** is a standalone HTML application inspired by the original BetaBrakeGame. It is designed to leverage Progressive Web App (PWA) features, allowing for flexible self-hosting or offline usage via browser download.
+**BetaBreakDigital** is a standalone HTML application inspired by the original Beta Break Game. It is designed to leverage Progressive Web App (PWA) features, allowing for flexible self-hosting or offline usage via browser download.
 
 ## Features
 
