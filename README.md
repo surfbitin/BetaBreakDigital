@@ -1,6 +1,6 @@
 # BetaBreakDigital
 
-A personal progressive web app based on [BetaBrakeGame](https://www.betabrakegame.com/) (not my creation).
+A personal progressive web app based on [Beta Berak](https://www.betabreakgame.com/) (not my creation).
 
 ## Overview
 
@@ -35,7 +35,7 @@ You can use BetaBreakDigital in two ways:
 
 ## Credits
 
-- Original game concept by the team at [BetaBreak](https://www.betabrakegame.com)
+- Original game concept by the team at [Beta Break](https://www.betabreakgame.com)
 - This repository is our personal adaptation and is not affiliated with the BetaBrakeGame creators
 
 ## License
@@ -44,4 +44,4 @@ Specify your preferred license (if any).
 
 ---
 
-> **Disclaimer**: This application is a fan adaptation. For the official game, please visit [betabrakegame.com](https://www.betabrakegame.com).
+> **Disclaimer**: This application is a fan adaptation. For the official game, please visit [betabreakgame.com](https://www.betabreakgame.com).
