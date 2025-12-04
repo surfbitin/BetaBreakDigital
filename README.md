@@ -38,10 +38,4 @@ You can use BetaBreakDigital in two ways:
 - Original game concept by the team at [Beta Break](https://www.betabreakgame.com)
 - This repository is our personal adaptation and is not affiliated with the BetaBrakeGame creators
 
-## License
-
-Specify your preferred license (if any).
-
----
-
 > **Disclaimer**: This application is a fan adaptation. For the official game, please visit [betabreakgame.com](https://www.betabreakgame.com).
